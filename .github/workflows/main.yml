@@ -41,18 +41,16 @@ jobs:
           pip install -r requirements.txt
           python manage.py test taskManager
 
-  zap_baseline:
+    zap_baseline:
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          ref: master
+      - run: |
+           docker pull owasp/zap2docker-stable:2.10.0
+           docker run --user root --rm -v $(pwd):/zap/wrk:rw -w /zap owasp/zap2docker-stable:2.10.0 zap-baseline.py -t ${{ secrets.PROD_URL }} -J zap-output.json
 
-      - name: ZAP Scan
-        uses: zaproxy/action-baseline@v0.4.0
+      - uses: actions/upload-artifact@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          docker_name: 'owasp/zap2docker-stable:2.10.0'
-          target: ${{ secrets.PROD_URL }}
+          name: ZAP Scan
+          path: zap-output.json
+        if: always()        # what is this for?
