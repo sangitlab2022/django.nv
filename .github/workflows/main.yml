@@ -54,3 +54,4 @@ jobs:
           name: ZAP Scan
           path: zap-output.json
         if: always()        # what is this for?
+      if: always()        # what is this for?
